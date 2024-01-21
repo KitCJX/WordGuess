@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WordGuess Game</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="info-board">
+      <h2>How to Play</h2>
+      <p>
+        Guess the word in 6 tries. Each guess must be a valid 5-letter word.
+      </p>
+      <p>
+        After each guess, the color of the tiles will change to show how close
+        your guess was to the word:
+      </p>
+      <ul class="color-info">
+        <li>
+          <span class="info-tile correct"></span> Correct letter in the correct
+          position
+        </li>
+        <li>
+          <span class="info-tile present"></span> Correct letter in the wrong
+          position
+        </li>
+        <li>
+          <span class="info-tile absent"></span> Letter not in the word in any
+          position
+        </li>
+      </ul>
+    </div>
+
+    <div class="game-container">
+      <h1>WordGuess</h1>
+      <div id="word-board"></div>
+      <input
+        type="text"
+        id="guess-input"
+        placeholder="Enter guess here"
+        maxlength="5"
+      />
+      <button id="guess-button">Guess</button>
+      <div id="message"></div>
+    </div>
+    <div id="try-count">0</div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

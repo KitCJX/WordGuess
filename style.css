@@ -1,0 +1,108 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f0f0;
+}
+
+.info-board {
+  margin-top: 20px;
+  text-align: left;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.color-info {
+  list-style-type: none;
+  padding: 0;
+}
+
+.color-info li {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.info-tile {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ddd;
+  margin-right: 10px;
+}
+
+.info-tile.correct {
+  background-color: #6aaa64; /* Green for correct letters */
+}
+
+.info-tile.present {
+  background-color: #c9b458; /* Yellow for present but misplaced letters */
+}
+
+.info-tile.absent {
+  background-color: #787c7e; /* Grey for absent letters */
+}
+
+.game-container {
+  text-align: center;
+}
+
+#word-board {
+  justify-content: center;
+  margin: 20px auto;
+}
+
+.guess-row {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#guess-input {
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+#guess-button {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.guess-tile {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #ddd;
+  margin: 5px;
+  line-height: 40px;
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.correct {
+  background-color: #6aaa64; /* Green for correct letters */
+}
+
+.present {
+  background-color: #c9b458; /* Yellow for present but misplaced letters */
+}
+
+#try-count {
+  font-size: 20px; /* Adjust the font size as needed */
+  font-weight: bold;
+  margin-top: 10px; /* Add margin for spacing */
+  color: #333; /* Text color */
+}
+
+@media (max-width: 600px) {
+  .guess-tile {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
+}
