@@ -121,7 +121,6 @@ async function endGame(win) {
 
     // Create and append audio
     const audioUrl = wordInfo.phonetics[0]?.audio;
-    console.log(audioUrl);
     if (audioUrl) {
       const audio = document.createElement("audio");
       audio.controls = true;
@@ -167,7 +166,7 @@ guessInput.addEventListener("keyup", (event) => {
 });
 
 function alohomora() {
-  alert(`The solution is: ${solutionWord}`);
+  console.log(`The solution is: ${solutionWord}`);
 }
 
 initializeGame();
