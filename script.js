@@ -119,6 +119,16 @@ async function endGame(win) {
       wordInfoDiv.appendChild(phoneticsPara);
     }
 
+    // Create and append audio
+    const audioUrl = wordInfo.phonetics[0]?.audio;
+    console.log(audioUrl);
+    if (audioUrl) {
+      const audio = document.createElement("audio");
+      audio.controls = true;
+      audio.src = audioUrl;
+      wordInfoDiv.appendChild(audio);
+    }
+
     // Create and append meanings information
     wordInfo.meanings.forEach((meaning) => {
       const meaningPara = document.createElement("p");
