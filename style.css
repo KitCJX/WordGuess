@@ -1,27 +1,37 @@
+:root {
+  /* Define color scheme and common dimensions */
+  --background-color: #f0f0f0;
+  --info-tile-border: #ddd;
+  --correct-color: #6aaa64;
+  --present-color: #c9b458;
+  --absent-color: #787c7e;
+  --tile-size: 40px;
+  --tile-size-small: 30px;
+}
+
 body {
   font-family: Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background-color: #f0f0f0;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  margin: 0; /* Reset default margin */
 }
 
 .info-board {
-  margin-top: 20px;
   text-align: left;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 350px;
+  margin: 1rem; /* Ensure some spacing around */
 }
 
 .color-info {
-  list-style-type: none;
+  list-style: none;
   padding: 0;
 }
 
 .color-info li {
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
 }
@@ -30,29 +40,34 @@ body {
   display: inline-block;
   width: 20px;
   height: 20px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--info-tile-border);
   margin-right: 10px;
 }
 
 .info-tile.correct {
-  background-color: #6aaa64; /* Green for correct letters */
+  background-color: var(--correct-color);
 }
 
 .info-tile.present {
-  background-color: #c9b458; /* Yellow for present but misplaced letters */
+  background-color: var(--present-color);
 }
 
 .info-tile.absent {
-  background-color: #787c7e; /* Grey for absent letters */
+  background-color: var(--absent-color);
 }
 
 .game-container {
   text-align: center;
+  margin: 1rem;
 }
 
 #word-board {
-  justify-content: center;
+  max-height: 250px;
+  overflow-y: auto;
   margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .guess-row {
@@ -61,48 +76,56 @@ body {
   margin-bottom: 10px;
 }
 
-#guess-input {
-  margin-bottom: 10px;
-  padding: 10px;
+#guess-input,
+#guess-button {
+  margin-bottom: 1rem;
+  padding: 0.625rem;
 }
 
 #guess-button {
-  padding: 10px 20px;
   cursor: pointer;
 }
 
 .guess-tile {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 2px solid #ddd;
+  width: var(--tile-size);
+  height: var(--tile-size);
+  border: 2px solid var(--info-tile-border);
   margin: 5px;
-  line-height: 40px;
+  line-height: var(--tile-size);
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
   transition: background-color 0.3s;
 }
 
-.correct {
-  background-color: #6aaa64; /* Green for correct letters */
+.guess-tile.correct {
+  background-color: var(--correct-color);
 }
 
-.present {
-  background-color: #c9b458; /* Yellow for present but misplaced letters */
+.guess-tile.present {
+  background-color: var(--present-color);
 }
 
-#try-count {
-  font-size: 20px; /* Adjust the font size as needed */
-  font-weight: bold;
-  margin-top: 10px; /* Add margin for spacing */
-  color: #333; /* Text color */
+.guess-tile.absent {
+  background-color: var(--absent-color);
 }
 
 @media (max-width: 600px) {
   .guess-tile {
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
+    width: var(--tile-size-small);
+    height: var(--tile-size-small);
+    line-height: var(--tile-size-small);
   }
+}
+
+#try-count {
+  display: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  color: #333;
+}
+
+#word-info {
+  text-align: left;
 }

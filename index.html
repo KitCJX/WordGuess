@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="info-board">
+    <section class="info-board">
       <h2>How to Play</h2>
       <p>
         Guess the word in 6 tries. Each guess must be a valid 5-letter word.
@@ -30,21 +30,25 @@
           position
         </li>
       </ul>
-    </div>
+    </section>
 
-    <div class="game-container">
+    <section class="game-container">
       <h1>WordGuess</h1>
-      <div id="word-board"></div>
+      <div>Guesses Left: <span id="guesses-left"></span></div>
+      <div id="word-board" aria-label="Word Board"></div>
       <input
         type="text"
         id="guess-input"
         placeholder="Enter guess here"
         maxlength="5"
+        aria-label="Guess Input"
       />
-      <button id="guess-button">Guess</button>
-      <div id="message"></div>
-    </div>
-    <div id="try-count">0</div>
+      <button id="guess-button" aria-label="Submit Guess">Guess</button>
+      <div id="message" role="alert"></div>
+      <div id="word-info"></div>
+    </section>
+
+    <section id="try-count">0</section>
 
     <script src="script.js"></script>
   </body>
