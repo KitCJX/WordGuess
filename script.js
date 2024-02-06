@@ -8,7 +8,8 @@ const guessesLeftSpan = document.getElementById("guesses-left");
 let solutionWord = "";
 let guessesLeft = 6; // Initialize with the total number of allowed guesses
 const maxTries = 6;
-const wordBankUrl = "https://github.com/YimKTP/WordGuess/raw/main/wordBank.txt";
+const wordBankUrl =
+  "https://raw.githubusercontent.com/YimKTP/WordGuess/main/wordBank.txt";
 
 async function fetchWordBank() {
   const response = await fetch(wordBankUrl);
