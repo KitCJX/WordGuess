@@ -115,7 +115,7 @@ async function endGame(win) {
     if (phoneticsText) {
       const phoneticsPara = document.createElement("p");
       phoneticsPara.textContent = `Phonetics: ${phoneticsText}`;
-      phoneticsPara.style = "your-styles-here"; // Add your CSS styles
+      phoneticsPara.style = "";
       wordInfoDiv.appendChild(phoneticsPara);
     }
 
@@ -125,14 +125,14 @@ async function endGame(win) {
       meaningPara.textContent = `${meaning.partOfSpeech}: ${meaning.definitions
         .map((def) => def.definition)
         .join(", ")}`;
-      meaningPara.style = "your-styles-here"; // Add your CSS styles
+      meaningPara.style = "";
       wordInfoDiv.appendChild(meaningPara);
     });
   } catch (error) {
     console.error("Failed to fetch word information:", error);
     const errorPara = document.createElement("p");
     errorPara.textContent = "Could not retrieve word information.";
-    errorPara.style = "your-error-styles-here"; // Add your CSS styles for error
+    errorPara.style = "";
     wordInfoDiv.appendChild(errorPara);
   }
 
