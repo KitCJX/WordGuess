@@ -1,12 +1,14 @@
 const wordBoard = document.getElementById("word-board");
 const guessInput = document.getElementById("guess-input");
 const guessButton = document.getElementById("guess-button");
+const playAgainButton = document.getElementById("play-again-button");
 const messageDiv = document.getElementById("message");
 const wordInfoDiv = document.getElementById("word-info");
 const guessesLeftSpan = document.getElementById("guesses-left");
 
 let solutionWord = "";
-let guessesLeft = 6; // Initialize with the total number of allowed guesses
+let wordInfo = null;
+let guessesLeft = 6;
 const maxTries = 6;
 const wordBankUrl =
   "https://raw.githubusercontent.com/YimKTP/WordGuess/main/wordBank.txt";
@@ -24,6 +26,16 @@ async function selectRandomWord() {
   const wordBank = await fetchWordBank();
   solutionWord =
     wordBank[Math.floor(Math.random() * wordBank.length)].toLowerCase();
+
+  const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${solutionWord}`;
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    wordInfo = data[0];
+  } catch (error) {
+    console.error("Failed to fetch word information:", error);
+    wordInfo = null;
+  }
 }
 
 function showMessage(message) {
@@ -35,18 +47,28 @@ function scrollToBottom() {
 }
 
 async function submitGuess() {
+  guessButton.disabled = true;
+  guessInput.disabled = true;
+
   const guess = guessInput.value.toLowerCase().trim();
   if (guess.length === 5) {
     processGuess(guess);
     guessInput.value = "";
     guessesLeft--;
-    guessesLeftSpan.textContent = guessesLeft; // Update guesses left
+    guessesLeftSpan.textContent = guessesLeft;
     if (guessesLeft <= 0 || guess === solutionWord) {
-      endGame(guess === solutionWord);
+      await endGame(guess === solutionWord);
+    } else {
+      guessButton.disabled = false;
+      guessInput.disabled = false;
     }
   } else {
     showMessage("Please enter a 5-letter word.");
+    guessButton.disabled = false;
+    guessInput.disabled = false;
   }
+
+  guessInput.focus();
 }
 
 function processGuess(guess) {
@@ -62,14 +84,12 @@ function updateBoard(guess, isCorrect) {
   const row = document.createElement("div");
   row.className = "guess-row";
 
-  // First pass: Check for correct letters
   guess.split("").forEach((char, i) => {
     if (char === solutionWord[i]) {
       solutionLetterCount[char]--;
     }
   });
 
-  // Second pass: Create tiles and mark them
   guess.split("").forEach((char, i) => {
     const tile = document.createElement("span");
     tile.className = "guess-tile";
@@ -80,6 +100,8 @@ function updateBoard(guess, isCorrect) {
     } else if (solutionWord.includes(char) && solutionLetterCount[char] > 0) {
       tile.classList.add("present");
       solutionLetterCount[char]--;
+    } else {
+      tile.classList.add("absent");
     }
 
     row.appendChild(tile);
@@ -93,34 +115,25 @@ async function endGame(win) {
   let message = win
     ? "Congratulations! You guessed the word!"
     : `You ran out of guesses. The word was: ${solutionWord}.`;
-  showMessage(message); // Show the basic win/lose message
+  showMessage(message);
 
-  // Clear previous word information
   const wordInfoDiv = document.getElementById("word-info");
   wordInfoDiv.innerHTML = "";
-
-  // Fetch word information from the API
-  const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${solutionWord}`;
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-
-    // Assuming data[0] contains the relevant word information
-    const wordInfo = data[0];
-
-    // Create and append phonetics information
+  if (wordInfo) {
     const phoneticsText = wordInfo.phonetics
-      .map((phonetic) => phonetic.text || phonetic.audio)
+      .filter((phonetic) => phonetic.text)
+      .map((phonetic) => phonetic.text)
       .join(", ");
+
     if (phoneticsText) {
       const phoneticsPara = document.createElement("p");
       phoneticsPara.textContent = `Phonetics: ${phoneticsText}`;
-      phoneticsPara.style = "";
       wordInfoDiv.appendChild(phoneticsPara);
     }
 
-    // Create and append audio
-    const audioUrl = wordInfo.phonetics[0]?.audio;
+    const audioUrl = wordInfo.phonetics.find(
+      (phonetic) => phonetic.audio
+    )?.audio;
     if (audioUrl) {
       const audio = document.createElement("audio");
       audio.controls = true;
@@ -128,7 +141,6 @@ async function endGame(win) {
       wordInfoDiv.appendChild(audio);
     }
 
-    // Create and append meanings information
     wordInfo.meanings.forEach((meaning) => {
       const meaningPara = document.createElement("p");
       meaningPara.textContent = `${meaning.partOfSpeech}: ${meaning.definitions
@@ -137,25 +149,35 @@ async function endGame(win) {
       meaningPara.style = "";
       wordInfoDiv.appendChild(meaningPara);
     });
-  } catch (error) {
-    console.error("Failed to fetch word information:", error);
+  } else {
     const errorPara = document.createElement("p");
     errorPara.textContent = "Could not retrieve word information.";
-    errorPara.style = "";
     wordInfoDiv.appendChild(errorPara);
   }
 
-  // Optionally, disable the guess button to prevent further guesses
   guessButton.disabled = true;
+  guessInput.disabled = true;
+  playAgainButton.style.display = "inline-block";
+  playAgainButton.focus();
+
+  playAgainButton.addEventListener("click", function () {
+    initializeGame();
+    playAgainButton.style.display = "none";
+  });
 }
 
 async function initializeGame() {
+  wordInfo = null;
   await selectRandomWord();
   guessButton.disabled = false;
-  guessesLeft = maxTries; // Reset guesses left to the max tries
-  guessesLeftSpan.textContent = guessesLeft; // Display initial guesses left
+  guessInput.disabled = false;
+  guessesLeft = maxTries;
+  guessesLeftSpan.textContent = guessesLeft;
   wordBoard.innerHTML = "";
-  showMessage("");
+  messageDiv.innerHTML = "";
+  wordInfoDiv.innerHTML = "";
+  showMessage("Start guessing...");
+  guessInput.focus();
 }
 
 guessButton.addEventListener("click", submitGuess);
