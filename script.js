@@ -10,31 +10,35 @@ let solutionWord = "";
 let wordInfo = null;
 let guessesLeft = 6;
 const maxTries = 6;
-const wordBankUrl =
-  "https://raw.githubusercontent.com/YimKTP/WordGuess/main/wordBank.txt";
+const wordBankUrl = "https://raw.githubusercontent.com/YimKTP/WordGuess/main/wordBank.txt";
 
 async function fetchWordBank() {
-  const response = await fetch(wordBankUrl);
-  const text = await response.text();
-  return text
-    .split("\n")
-    .map((word) => word.trim())
-    .filter((word) => word.length === 5);
+  try {
+    const response = await fetch(wordBankUrl);
+    const text = await response.text();
+    return text.split("\n").map(word => word.trim()).filter(word => word.length === 5);
+  } catch (error) {
+    console.error("Failed to fetch word bank:", error);
+    return [];
+  }
 }
 
 async function selectRandomWord() {
   const wordBank = await fetchWordBank();
-  solutionWord =
-    wordBank[Math.floor(Math.random() * wordBank.length)].toLowerCase();
+  if (wordBank.length > 0) {
+    solutionWord = wordBank[Math.floor(Math.random() * wordBank.length)].toLowerCase();
 
-  const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${solutionWord}`;
-  try {
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    wordInfo = data[0];
-  } catch (error) {
-    console.error("Failed to fetch word information:", error);
-    wordInfo = null;
+    const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${solutionWord}`;
+    try {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      wordInfo = data[0];
+    } catch (error) {
+      console.error("Failed to fetch word information:", error);
+      wordInfo = null;
+    }
+  } else {
+    showMessage("Failed to load word bank.");
   }
 }
 
@@ -112,43 +116,12 @@ function updateBoard(guess, isCorrect) {
 }
 
 async function endGame(win) {
-  let message = win
-    ? "Congratulations! You guessed the word!"
-    : `You ran out of guesses. The word was: ${solutionWord}.`;
+  let message = win ? "Congratulations! You guessed the word!" : `You ran out of guesses. The word was: ${solutionWord}.`;
   showMessage(message);
 
-  const wordInfoDiv = document.getElementById("word-info");
   wordInfoDiv.innerHTML = "";
   if (wordInfo) {
-    const phoneticsText = wordInfo.phonetics
-      .filter((phonetic) => phonetic.text)
-      .map((phonetic) => phonetic.text)
-      .join(", ");
-
-    if (phoneticsText) {
-      const phoneticsPara = document.createElement("p");
-      phoneticsPara.textContent = `Phonetics: ${phoneticsText}`;
-      wordInfoDiv.appendChild(phoneticsPara);
-    }
-
-    const audioUrl = wordInfo.phonetics.find(
-      (phonetic) => phonetic.audio
-    )?.audio;
-    if (audioUrl) {
-      const audio = document.createElement("audio");
-      audio.controls = true;
-      audio.src = audioUrl;
-      wordInfoDiv.appendChild(audio);
-    }
-
-    wordInfo.meanings.forEach((meaning) => {
-      const meaningPara = document.createElement("p");
-      meaningPara.textContent = `${meaning.partOfSpeech}: ${meaning.definitions
-        .map((def) => def.definition)
-        .join(", ")}`;
-      meaningPara.style = "";
-      wordInfoDiv.appendChild(meaningPara);
-    });
+    displayWordInfo(wordInfo);
   } else {
     const errorPara = document.createElement("p");
     errorPara.textContent = "Could not retrieve word information.";
@@ -159,15 +132,35 @@ async function endGame(win) {
   guessInput.disabled = true;
   playAgainButton.style.display = "inline-block";
   playAgainButton.focus();
+}
 
-  playAgainButton.addEventListener("click", function () {
-    initializeGame();
-    playAgainButton.style.display = "none";
+function displayWordInfo(wordInfo) {
+  const phoneticsText = wordInfo.phonetics.filter(phonetic => phonetic.text).map(phonetic => phonetic.text).join(", ");
+  if (phoneticsText) {
+    const phoneticsPara = document.createElement("p");
+    phoneticsPara.textContent = `Phonetics: ${phoneticsText}`;
+    wordInfoDiv.appendChild(phoneticsPara);
+  }
+
+  const audioUrl = wordInfo.phonetics.find(phonetic => phonetic.audio)?.audio;
+  if (audioUrl) {
+    const audio = document.createElement("audio");
+    audio.controls = true;
+    audio.src = audioUrl;
+    wordInfoDiv.appendChild(audio);
+  }
+
+  wordInfo.meanings.forEach(meaning => {
+    const meaningPara = document.createElement("p");
+    meaningPara.textContent = `${meaning.partOfSpeech}: ${meaning.definitions.map(def => def.definition).join(", ")}`;
+    wordInfoDiv.appendChild(meaningPara);
   });
 }
 
 async function initializeGame() {
   wordInfo = null;
+  guessButton.disabled = true;
+  guessInput.disabled = true;
   await selectRandomWord();
   guessButton.disabled = false;
   guessInput.disabled = false;
@@ -179,6 +172,11 @@ async function initializeGame() {
   showMessage("Start guessing...");
   guessInput.focus();
 }
+
+playAgainButton.addEventListener("click", function () {
+  initializeGame();
+  playAgainButton.style.display = "none";
+});
 
 guessButton.addEventListener("click", submitGuess);
 guessInput.addEventListener("keyup", (event) => {
