@@ -10,7 +10,7 @@ let solutionWord = "";
 let wordInfo = null;
 let guessesLeft = 6;
 const maxTries = 6;
-const wordBankUrl = "https://raw.githubusercontent.com/YimKTP/WordGuess/main/wordBank.txt";
+const wordBankUrl = "https://raw.githubusercontent.com/KitCJX/WordGuess/main/wordBank.txt";
 
 async function fetchWordBank() {
   try {
