@@ -6,7 +6,7 @@ WordGuess is a fun and interactive web-based game where players have the challen
 
 ## Live Demo
 
-Check out the game live [here](https://yimktp.github.io/WordGuess/).
+Check out the game live [here](https://kitcjx.github.io/WordGuess/).
 
 ## How to Play
 
