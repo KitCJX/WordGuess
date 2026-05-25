@@ -689,3 +689,10 @@ export function attachPlayAgainHandler(handler) {
     handler();
   });
 }
+
+export function markBoardSolved(boardIdx) {
+  const boardEl = document.getElementById(`board-${boardIdx + 1}`);
+  if (boardEl) {
+    boardEl.classList.add("solved");
+  }
+}

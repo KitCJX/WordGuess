@@ -519,6 +519,9 @@ function processDuoGuess(guess) {
     ui.revealRow(guesses.length - 1, guess, eval1, 0);
     if (guess === solutionWord1) {
       board1Solved = true;
+      setTimeout(() => {
+        ui.markBoardSolved(0);
+      }, 1000);
     }
   }
 
@@ -527,6 +530,9 @@ function processDuoGuess(guess) {
     ui.revealRow(guesses.length - 1, guess, eval2, 1);
     if (guess === solutionWord2) {
       board2Solved = true;
+      setTimeout(() => {
+        ui.markBoardSolved(1);
+      }, 1000);
     }
   }
 
