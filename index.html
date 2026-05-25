@@ -2,58 +2,291 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WordGuess Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>WordGuess — Premium Word Puzzle</title>
+    <meta name="description" content="Guess the secret 5-letter word in 6 attempts. Sleek animations, stats tracker, definitions, and sound effects." />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body>
-    <section class="info-board">
-      <h2>How to Play</h2>
-      <p>
-        Guess the word in 6 tries. Each guess must be a valid 5-letter word.
-      </p>
-      <p>
-        After each guess, the color of the tiles will change to show how close
-        your guess was to the word:
-      </p>
-      <ul class="color-info">
-        <li>
-          <span class="info-tile correct"></span> Correct letter in the correct
-          position
-        </li>
-        <li>
-          <span class="info-tile present"></span> Correct letter in the wrong
-          position
-        </li>
-        <li>
-          <span class="info-tile absent"></span> Letter not in the word in any
-          position
-        </li>
-      </ul>
-    </section>
+  <body class="dark-theme">
+    <div class="app-container">
+      <header>
+        <div class="header-content">
+          <button id="help-btn" class="icon-btn" aria-label="How to play">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </button>
+          
+          <h1 class="logo">WORD<span>GUESS</span></h1>
+          
+          <div class="header-actions">
+            <button id="stats-btn" class="icon-btn" aria-label="Game statistics">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </button>
+            <button id="settings-btn" class="icon-btn" aria-label="Settings">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </button>
+          </div>
+        </div>
+      </header>
 
-    <section class="game-container">
-      <h1>WordGuess</h1>
-      <div>Guesses Left: <span id="guesses-left"></span></div>
-      <div id="word-board" aria-label="Word Board"></div>
-      <input
-        type="text"
-        id="guess-input"
-        placeholder="Enter guess here"
-        maxlength="5"
-        aria-label="Guess Input"
-      />
-      <button id="guess-button" aria-label="Submit Guess">Guess</button>
-      <button
-        id="play-again-button"
-        aria-label="Play Again"
-        style="display: none"
-      >
-        Play Again!
-      </button>
-      <div id="message" role="alert"></div>
-      <div id="word-info"></div>
-    </section>
+      <main class="game-content">
+        <div id="board" aria-label="Game board grid">
+          <!-- 6 rows of 5 tiles generated or static. Pre-rendering keeps it layout stable -->
+          <div class="row" data-row="0">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+          <div class="row" data-row="1">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+          <div class="row" data-row="2">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+          <div class="row" data-row="3">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+          <div class="row" data-row="4">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+          <div class="row" data-row="5">
+            <div class="tile" data-idx="0"></div>
+            <div class="tile" data-idx="1"></div>
+            <div class="tile" data-idx="2"></div>
+            <div class="tile" data-idx="3"></div>
+            <div class="tile" data-idx="4"></div>
+          </div>
+        </div>
+      </main>
+
+      <footer>
+        <div id="keyboard" aria-label="Virtual keyboard">
+          <div class="keyboard-row">
+            <button class="key" data-key="q">q</button>
+            <button class="key" data-key="w">w</button>
+            <button class="key" data-key="e">e</button>
+            <button class="key" data-key="r">r</button>
+            <button class="key" data-key="t">t</button>
+            <button class="key" data-key="y">y</button>
+            <button class="key" data-key="u">u</button>
+            <button class="key" data-key="i">i</button>
+            <button class="key" data-key="o">o</button>
+            <button class="key" data-key="p">p</button>
+          </div>
+          <div class="keyboard-row">
+            <div class="spacer"></div>
+            <button class="key" data-key="a">a</button>
+            <button class="key" data-key="s">s</button>
+            <button class="key" data-key="d">d</button>
+            <button class="key" data-key="f">f</button>
+            <button class="key" data-key="g">g</button>
+            <button class="key" data-key="h">h</button>
+            <button class="key" data-key="j">j</button>
+            <button class="key" data-key="k">k</button>
+            <button class="key" data-key="l">l</button>
+            <div class="spacer"></div>
+          </div>
+          <div class="keyboard-row">
+            <button class="key action-key" data-key="enter">ENTER</button>
+            <button class="key" data-key="z">z</button>
+            <button class="key" data-key="x">x</button>
+            <button class="key" data-key="c">c</button>
+            <button class="key" data-key="v">v</button>
+            <button class="key" data-key="b">b</button>
+            <button class="key" data-key="n">n</button>
+            <button class="key" data-key="m">m</button>
+            <button class="key action-key" data-key="backspace" aria-label="Backspace">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" aria-live="polite"></div>
+
+    <!-- Help Dialog -->
+    <dialog id="help-dialog" class="glass-modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2>How To Play</h2>
+          <button class="close-btn icon-btn" aria-label="Close dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <p>Guess the word in 6 tries. Each guess must be a valid 5-letter word.</p>
+          <p>The color of the tiles will change to show how close your guess was to the word.</p>
+          
+          <hr />
+          
+          <h3>Examples</h3>
+          <div class="example-item">
+            <div class="example-row">
+              <div class="tile correct">w</div>
+              <div class="tile">e</div>
+              <div class="tile">a</div>
+              <div class="tile">r</div>
+              <div class="tile">y</div>
+            </div>
+            <p><strong>W</strong> is in the word and in the correct spot.</p>
+          </div>
+          
+          <div class="example-item">
+            <div class="example-row">
+              <div class="tile">p</div>
+              <div class="tile present">i</div>
+              <div class="tile">l</div>
+              <div class="tile">o</div>
+              <div class="tile">t</div>
+            </div>
+            <p><strong>I</strong> is in the word but in the wrong spot.</p>
+          </div>
+          
+          <div class="example-item">
+            <div class="example-row">
+              <div class="tile">v</div>
+              <div class="tile">a</div>
+              <div class="tile">g</div>
+              <div class="tile absent">u</div>
+              <div class="tile">e</div>
+            </div>
+            <p><strong>U</strong> is not in the word in any spot.</p>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Stats / Game Over Dialog -->
+    <dialog id="stats-dialog" class="glass-modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2>STATISTICS</h2>
+          <button class="close-btn icon-btn" aria-label="Close dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="stats-grid">
+            <div class="stat-box">
+              <span id="stat-played" class="stat-val">0</span>
+              <span class="stat-label">Played</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-winpct" class="stat-val">0</span>
+              <span class="stat-label">Win %</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-streak" class="stat-val">0</span>
+              <span class="stat-label">Current Streak</span>
+            </div>
+            <div class="stat-box">
+              <span id="stat-maxstreak" class="stat-val">0</span>
+              <span class="stat-label">Max Streak</span>
+            </div>
+          </div>
+          
+          <h3>GUESS DISTRIBUTION</h3>
+          <div id="guess-dist" class="dist-chart">
+            <!-- Dynamically populated bars -->
+          </div>
+
+          <div id="dictionary-card" class="dict-card" style="display: none;">
+            <hr />
+            <div class="dict-header">
+              <h3 id="dict-word">WORD</h3>
+              <div class="dict-pronounce">
+                <span id="dict-phonetics">/pəʊ.ətr.i/</span>
+                <button id="pronounce-audio-btn" class="icon-btn" aria-label="Play pronunciation">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                </button>
+              </div>
+            </div>
+            <div id="dict-meanings" class="dict-meanings">
+              <!-- Meanings list -->
+            </div>
+          </div>
+
+          <div class="game-over-actions">
+            <button id="play-again-btn" class="btn primary-btn">Play Again</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Settings Dialog -->
+    <dialog id="settings-dialog" class="glass-modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2>SETTINGS</h2>
+          <button class="close-btn icon-btn" aria-label="Close dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Sound Effects</span>
+              <span class="setting-desc">Chimes and interface feedback</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="sound-toggle" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+          
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Dark Theme</span>
+              <span class="setting-desc">Switch between Dark and Light mode</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="theme-toggle" checked>
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Color Blind Mode</span>
+              <span class="setting-desc">High-contrast colors for tiles</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="colorblind-toggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
+          <hr />
+          <div class="settings-footer">
+            <p>Created by CJX1001</p>
+            <p class="version">v2.0.0 — Vanilla Web Stack</p>
+          </div>
+        </div>
+      </div>
+    </dialog>
 
     <script src="src/main.js" type="module"></script>
   </body>
