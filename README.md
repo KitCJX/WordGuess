@@ -1,6 +1,6 @@
-# WordGuess — Premium Word Puzzle Game
+# WordGuess — Word Puzzle Game
 
-WordGuess is a high-fidelity, interactive web-based word puzzle game built on a **purely vanilla web stack** (HTML, CSS, and JavaScript). Taking inspiration from the classic Wordle, this reworked version leverages modern browser APIs, premium dark slate aesthetics, programmatic sound synthesis, and local storage state persistence.
+WordGuess is a high-fidelity, interactive web-based word puzzle game built on a **purely vanilla web stack** (HTML, CSS, and JavaScript). Taking inspiration from the classic Wordle, this reworked version leverages modern browser APIs, dark slate aesthetics, programmatic sound synthesis, and local storage state persistence.
 
 ## 🔗 Live Demo
 
@@ -8,7 +8,7 @@ Play the game live here: [kitcjx.github.io/WordGuess/](https://kitcjx.github.io/
 
 ---
 
-## 🌟 Premium Features
+## 🌟 Features
 
 - **Direct-Keyboard Grid Board**: Type letters directly on your physical keyboard or tap the responsive on-screen keyboard. Pop-in animations trigger as you compose your guess.
 - **Sequential 3D Tile Flips**: Smooth, hardware-accelerated 3D horizontal rotations flip each tile one by one when a guess is submitted, swapping the background color precisely at the 90-degree midpoint.
