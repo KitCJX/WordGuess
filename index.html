@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="color-scheme" content="light dark" />
     <title>WordGuess — Word Puzzle</title>
     <meta name="description" content="Guess the secret 5-letter word in 6 attempts. Sleek animations, stats tracker, definitions, and sound effects." />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -12,30 +13,53 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body class="dark-theme">
+  <body>
+    <script>
+      {
+        const savedTheme = localStorage.getItem("wordguess_theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const activeTheme = savedTheme || (prefersLight ? "light" : "dark");
+        if (activeTheme === "light") {
+          document.documentElement.classList.add("light-theme");
+          document.documentElement.classList.remove("dark-theme");
+          const meta = document.querySelector('meta[name="color-scheme"]');
+          if (meta) meta.content = "light";
+        } else {
+          document.documentElement.classList.add("dark-theme");
+          document.documentElement.classList.remove("light-theme");
+          const meta = document.querySelector('meta[name="color-scheme"]');
+          if (meta) meta.content = "dark";
+        }
+        
+        const savedColorblind = localStorage.getItem("wordguess_colorblind") === "true";
+        if (savedColorblind) {
+          document.documentElement.classList.add("colorblind-theme");
+        }
+      }
+    </script>
     <div class="app-container">
       <header>
         <div class="header-content">
           <div class="header-left">
             <button id="help-btn" class="icon-btn" aria-label="How to play">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             </button>
             <button id="mode-btn" class="icon-btn" aria-label="Select Game Mode">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
             </button>
           </div>
           
           <div class="logo-wrapper">
             <h1 class="logo">WORD<span>GUESS</span></h1>
-            <div id="mode-title" class="mode-indicator">Classic</div>
+            <div id="mode-title" class="mode-indicator">Daily Challenge</div>
           </div>
           
           <div class="header-actions">
             <button id="stats-btn" class="icon-btn" aria-label="Game statistics">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
             </button>
             <button id="settings-btn" class="icon-btn" aria-label="Settings">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
             </button>
           </div>
         </div>
@@ -45,7 +69,7 @@
         <div class="hud-wrapper">
           <!-- Time Attack HUD -->
           <div id="timer-bar" class="hud-item" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span id="game-timer">02:00</span>
             <span class="hud-divider">|</span>
             <span>Score: <strong id="game-score">0</strong></span>
@@ -99,7 +123,7 @@
             <button class="key" data-key="n">n</button>
             <button class="key" data-key="m">m</button>
             <button class="key action-key" data-key="backspace" aria-label="Backspace">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
             </button>
           </div>
         </div>
@@ -110,64 +134,161 @@
     <div id="toast-container" aria-live="polite"></div>
 
     <!-- Help Dialog -->
-    <dialog id="help-dialog" class="glass-modal">
+    <dialog id="help-dialog" class="glass-modal" closedby="any" aria-labelledby="help-title">
       <div class="modal-content">
         <header class="modal-header">
-          <h2>How To Play</h2>
+          <h2 id="help-title">How To Play</h2>
           <button class="close-btn icon-btn" aria-label="Close dialog">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </header>
         <div class="modal-body">
-          <p>Guess the word in 6 tries. Each guess must be a valid 5-letter word.</p>
-          <p>The color of the tiles will change to show how close your guess was to the word.</p>
-          
-          <hr />
-          
-          <h3>Examples</h3>
-          <div class="example-item">
-            <div class="example-row">
-              <div class="tile correct">w</div>
-              <div class="tile">e</div>
-              <div class="tile">a</div>
-              <div class="tile">r</div>
-              <div class="tile">y</div>
+          <!-- Daily Challenge Help (Active by default) -->
+          <div id="help-content-daily" class="help-mode-section">
+            <p>A new secret word is generated every day, and it's the same for players all over the world.</p>
+            <p>Guess the word in 6 tries. Each guess must be a valid 5-letter word.</p>
+            <p>The color of the tiles will change to show how close your guess was to the word.</p>
+            <p>Once finished (win or lose), copy your scores and grid patterns using the <strong>Share Result</strong> button to share with friends!</p>
+            <hr />
+            <h3>Examples</h3>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile correct">w</div>
+                <div class="tile">e</div>
+                <div class="tile">a</div>
+                <div class="tile">r</div>
+                <div class="tile">y</div>
+              </div>
+              <p><strong>W</strong> is in the word and in the correct spot.</p>
             </div>
-            <p><strong>W</strong> is in the word and in the correct spot.</p>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile">p</div>
+                <div class="tile present">i</div>
+                <div class="tile">l</div>
+                <div class="tile">o</div>
+                <div class="tile">t</div>
+              </div>
+              <p><strong>I</strong> is in the word but in the wrong spot.</p>
+            </div>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile">v</div>
+                <div class="tile">a</div>
+                <div class="tile">g</div>
+                <div class="tile absent">u</div>
+                <div class="tile">e</div>
+              </div>
+              <p><strong>U</strong> is not in the word in any spot.</p>
+            </div>
           </div>
-          
-          <div class="example-item">
-            <div class="example-row">
-              <div class="tile">p</div>
-              <div class="tile present">i</div>
-              <div class="tile">l</div>
-              <div class="tile">o</div>
-              <div class="tile">t</div>
+
+          <!-- Unlimited Mode Help -->
+          <div id="help-content-unlimited" class="help-mode-section" style="display: none;">
+            <p>Play as many games as you want! Guess the secret word in 6 tries.</p>
+            <p>Each guess must be a valid 5-letter word. The color of the tiles will change to show how close your guess was to the word.</p>
+            <hr />
+            <h3>Examples</h3>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile correct">w</div>
+                <div class="tile">e</div>
+                <div class="tile">a</div>
+                <div class="tile">r</div>
+                <div class="tile">y</div>
+              </div>
+              <p><strong>W</strong> is in the word and in the correct spot.</p>
             </div>
-            <p><strong>I</strong> is in the word but in the wrong spot.</p>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile">p</div>
+                <div class="tile present">i</div>
+                <div class="tile">l</div>
+                <div class="tile">o</div>
+                <div class="tile">t</div>
+              </div>
+              <p><strong>I</strong> is in the word but in the wrong spot.</p>
+            </div>
+            <div class="example-item">
+              <div class="example-row">
+                <div class="tile">v</div>
+                <div class="tile">a</div>
+                <div class="tile">g</div>
+                <div class="tile absent">u</div>
+                <div class="tile">e</div>
+              </div>
+              <p><strong>U</strong> is not in the word in any spot.</p>
+            </div>
           </div>
-          
-          <div class="example-item">
-            <div class="example-row">
-              <div class="tile">v</div>
-              <div class="tile">a</div>
-              <div class="tile">g</div>
-              <div class="tile absent">u</div>
-              <div class="tile">e</div>
+
+          <!-- Duo Mode Help -->
+          <div id="help-content-duo" class="help-mode-section" style="display: none;">
+            <p>Dordle style: solve two 5-letter words at the same time in 7 attempts.</p>
+            <p>Each word you guess is entered on both boards simultaneously.</p>
+            <p>Once a board is solved, it locks down and keyboard entries only apply to the remaining board.</p>
+            <hr />
+            <h3>Keyboard Coloring Rules</h3>
+            <p>Since keys are shared, the virtual keyboard combines letter evaluations from both boards. Green (correct) takes precedence over Yellow (present), which takes precedence over Gray (absent).</p>
+            <div class="example-item">
+              <div class="duo-example-row">
+                <div class="example-board-half">
+                  <div class="tile correct">e</div>
+                  <span>Board 1: Correct</span>
+                </div>
+                <div class="example-board-half">
+                  <div class="tile absent">e</div>
+                  <span>Board 2: Absent</span>
+                </div>
+              </div>
+              <p>The keyboard key <strong>E</strong> will color as <strong style="color: var(--color-correct)">Green (Correct)</strong>.</p>
             </div>
-            <p><strong>U</strong> is not in the word in any spot.</p>
+          </div>
+
+          <!-- Time Attack Help -->
+          <div id="help-content-time_attack" class="help-mode-section" style="display: none;">
+            <p>Solve as many words as possible before the timer runs out!</p>
+            <p>Each word solved resets the board and gives you a new solution word.</p>
+            <hr />
+            <h3>Time Attack Rules</h3>
+            <ul style="padding-left: 20px; margin-bottom: 12px; font-size: 14px;">
+              <li>⏱️ <strong>Starting Time:</strong> 2 minutes.</li>
+              <li>✨ <strong>Points:</strong> +1 Point per correct word.</li>
+              <li>➕ <strong>Bonus Time:</strong> +15 seconds per correct word (capped at 5 minutes).</li>
+              <li>🔄 <strong>Key Persistence:</strong> Keyboard letter colors carry over to the next word so you don't lose track of solved letters.</li>
+            </ul>
+          </div>
+
+          <!-- Clue Mode Help -->
+          <div id="help-content-clue" class="help-mode-section" style="display: none;">
+            <p>Solve the word in 6 attempts, with a hint!</p>
+            <p>A dictionary definition of the secret word is displayed in the clue banner at the top of the grid. Use it to narrow down your guesses.</p>
+            <hr />
+            <h3>Standard Evaluation</h3>
+            <p>Normal WordGuess tile rules apply. Use the definition to help you think of possible solutions!</p>
+          </div>
+
+          <!-- Pass & Play Help -->
+          <div id="help-content-pass_play" class="help-mode-section" style="display: none;">
+            <p>Challenge a friend locally!</p>
+            <hr />
+            <h3>Multiplayer Rules</h3>
+            <ul style="padding-left: 20px; margin-bottom: 12px; font-size: 14px;">
+              <li>🧑‍💻 <strong>Player 1:</strong> Types a secret 5-letter word. It must be a valid word from our dictionary list.</li>
+              <li>🎮 <strong>Player 2:</strong> Attempts to solve the custom word in 6 attempts.</li>
+            </ul>
+            <p>Pass the device between players during set up so that Player 2 does not see the secret solution!</p>
           </div>
         </div>
       </div>
     </dialog>
 
     <!-- Stats / Game Over Dialog -->
-    <dialog id="stats-dialog" class="glass-modal">
+    <dialog id="stats-dialog" class="glass-modal" closedby="any" aria-labelledby="stats-title">
       <div class="modal-content">
         <header class="modal-header">
-          <h2>STATISTICS</h2>
+          <h2 id="stats-title">STATISTICS</h2>
           <button class="close-btn icon-btn" aria-label="Close dialog">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </header>
         <div class="modal-body">
@@ -202,7 +323,7 @@
               <div class="dict-pronounce">
                 <span id="dict-phonetics">/pəʊ.ətr.i/</span>
                 <button id="pronounce-audio-btn" class="icon-btn" aria-label="Play pronunciation">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
                 </button>
               </div>
             </div>
@@ -220,12 +341,12 @@
     </dialog>
 
     <!-- Settings Dialog -->
-    <dialog id="settings-dialog" class="glass-modal">
+    <dialog id="settings-dialog" class="glass-modal" closedby="any" aria-labelledby="settings-title">
       <div class="modal-content">
         <header class="modal-header">
-          <h2>SETTINGS</h2>
+          <h2 id="settings-title">SETTINGS</h2>
           <button class="close-btn icon-btn" aria-label="Close dialog">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </header>
         <div class="modal-body">
@@ -262,6 +383,17 @@
             </label>
           </div>
 
+          <div class="setting-row">
+            <div class="setting-info">
+              <span class="setting-title">Hard Mode</span>
+              <span class="setting-desc">Must use hints in subsequent guesses</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="hardmode-toggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+
           <hr />
           <div class="settings-footer">
             <p>Created by CJX1001</p>
@@ -272,23 +404,23 @@
     </dialog>
 
     <!-- Mode Selector Dialog -->
-    <dialog id="mode-dialog" class="glass-modal">
+    <dialog id="mode-dialog" class="glass-modal" closedby="any" aria-labelledby="mode-title-modal">
       <div class="modal-content">
         <header class="modal-header">
-          <h2>SELECT MODE</h2>
+          <h2 id="mode-title-modal">SELECT MODE</h2>
           <button class="close-btn icon-btn" aria-label="Close dialog">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </header>
         <div class="modal-body">
           <div class="mode-list">
-            <button class="mode-card active" data-mode="classic">
+            <button class="mode-card" data-mode="unlimited">
               <div class="mode-header-info">
-                <span class="mode-name">Classic Mode</span>
+                <span class="mode-name">Unlimited Mode</span>
                 <span class="mode-desc">Relaxed, unlimited 5-letter word puzzles.</span>
               </div>
             </button>
-            <button class="mode-card" data-mode="daily">
+            <button class="mode-card active" data-mode="daily">
               <div class="mode-header-info">
                 <span class="mode-name">Daily Challenge</span>
                 <span class="mode-desc">A new puzzle every day, identical for everyone. Share results!</span>
@@ -324,17 +456,17 @@
     </dialog>
 
     <!-- Pass & Play Input Modal -->
-    <dialog id="passplay-dialog" class="glass-modal">
+    <dialog id="passplay-dialog" class="glass-modal" aria-labelledby="passplay-title">
       <div class="modal-content">
         <header class="modal-header">
-          <h2>CREATE WORD</h2>
+          <h2 id="passplay-title">CREATE WORD</h2>
         </header>
         <div class="modal-body">
           <p>Player 1: Enter a secret 5-letter word for Player 2 to guess.</p>
           <div class="passplay-input-container">
             <input type="text" id="custom-word-input" class="masked-input" maxlength="5" placeholder="Enter 5-letter word" autofocus autocomplete="off" spellcheck="false" />
             <button id="toggle-word-visibility" class="icon-btn" aria-label="Toggle word visibility">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
           </div>
           <div id="passplay-error" class="passplay-error-message"></div>

@@ -37,6 +37,7 @@ const closeBtns = document.querySelectorAll("dialog .close-btn");
 const soundToggle = document.getElementById("sound-toggle");
 const themeToggle = document.getElementById("theme-toggle");
 const colorblindToggle = document.getElementById("colorblind-toggle");
+const hardModeToggle = document.getElementById("hardmode-toggle");
 
 // Stats Spans
 const statPlayed = document.getElementById("stat-played");
@@ -66,16 +67,39 @@ let passPlayCancelHandler = null;
 // Initialize Settings and Dialog Bindings
 export function setupSettings() {
   // Theme Setup
-  const isDark = !document.body.classList.contains("light-theme");
+  let savedTheme = localStorage.getItem("wordguess_theme");
+  if (!savedTheme) {
+    savedTheme = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+
+  const isDark = savedTheme === "dark";
   themeToggle.checked = isDark;
+  
+  if (isDark) {
+    document.documentElement.classList.add("dark-theme");
+    document.documentElement.classList.remove("light-theme");
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = "dark";
+  } else {
+    document.documentElement.classList.add("light-theme");
+    document.documentElement.classList.remove("dark-theme");
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = "light";
+  }
   
   themeToggle.addEventListener("change", () => {
     if (themeToggle.checked) {
-      document.body.classList.remove("light-theme");
-      document.body.classList.add("dark-theme");
+      document.documentElement.classList.remove("light-theme");
+      document.documentElement.classList.add("dark-theme");
+      localStorage.setItem("wordguess_theme", "dark");
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = "dark";
     } else {
-      document.body.classList.remove("dark-theme");
-      document.body.classList.add("light-theme");
+      document.documentElement.classList.remove("dark-theme");
+      document.documentElement.classList.add("light-theme");
+      localStorage.setItem("wordguess_theme", "light");
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = "light";
     }
   });
 
@@ -86,18 +110,47 @@ export function setupSettings() {
   });
 
   // Colorblind Setup
-  const isColorblind = document.body.classList.contains("colorblind-theme");
-  colorblindToggle.checked = isColorblind;
+  const savedColorblind = localStorage.getItem("wordguess_colorblind") === "true";
+  colorblindToggle.checked = savedColorblind;
+  if (savedColorblind) {
+    document.documentElement.classList.add("colorblind-theme");
+  } else {
+    document.documentElement.classList.remove("colorblind-theme");
+  }
+  
   colorblindToggle.addEventListener("change", () => {
     if (colorblindToggle.checked) {
-      document.body.classList.add("colorblind-theme");
+      document.documentElement.classList.add("colorblind-theme");
+      localStorage.setItem("wordguess_colorblind", "true");
     } else {
-      document.body.classList.remove("colorblind-theme");
+      document.documentElement.classList.remove("colorblind-theme");
+      localStorage.setItem("wordguess_colorblind", "false");
     }
   });
 
+  // Hard Mode Setup
+  const savedHardMode = localStorage.getItem("wordguess_hardmode") === "true";
+  hardModeToggle.checked = savedHardMode;
+  game.setHardMode(savedHardMode);
+  
+  hardModeToggle.addEventListener("change", () => {
+    game.setHardMode(hardModeToggle.checked);
+    localStorage.setItem("wordguess_hardmode", hardModeToggle.checked ? "true" : "false");
+  });
+
   // Dialog Button Click Listeners
-  helpBtn.addEventListener("click", () => helpDialog.showModal());
+  helpBtn.addEventListener("click", () => {
+    const currentMode = game.getGameMode();
+    const sections = helpDialog.querySelectorAll(".help-mode-section");
+    sections.forEach(sec => {
+      if (sec.id === `help-content-${currentMode}`) {
+        sec.style.display = "block";
+      } else {
+        sec.style.display = "none";
+      }
+    });
+    helpDialog.showModal();
+  });
   statsBtn.addEventListener("click", () => showStatsModal());
   settingsBtn.addEventListener("click", () => settingsDialog.showModal());
   modeBtn.addEventListener("click", () => modeDialog.showModal());
@@ -108,23 +161,23 @@ export function setupSettings() {
     });
   });
 
-  // Close dialog on clicking backdrop
-  [helpDialog, statsDialog, settingsDialog, modeDialog, passplayDialog].forEach(dialog => {
-    dialog.addEventListener("click", (e) => {
-      // Don't close Pass & Play dialog by clicking backdrop (needs solution input!)
-      if (dialog === passplayDialog) return;
-
-      const dialogDimensions = dialog.getBoundingClientRect();
-      if (
-        e.clientX < dialogDimensions.left ||
-        e.clientX > dialogDimensions.right ||
-        e.clientY < dialogDimensions.top ||
-        e.clientY > dialogDimensions.bottom
-      ) {
-        dialog.close();
-      }
+  // Close dialog on clicking backdrop (Fallback for browsers without native closedby support)
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    [helpDialog, statsDialog, settingsDialog, modeDialog].forEach(dialog => {
+      dialog.addEventListener("click", (e) => {
+        if (e.target !== dialog) return;
+        const dialogDimensions = dialog.getBoundingClientRect();
+        if (
+          e.clientX < dialogDimensions.left ||
+          e.clientX > dialogDimensions.right ||
+          e.clientY < dialogDimensions.top ||
+          e.clientY > dialogDimensions.bottom
+        ) {
+          dialog.close();
+        }
+      });
     });
-  });
+  }
 
   // Pronounce Audio click
   pronounceAudioBtn.addEventListener("click", () => {
@@ -161,8 +214,8 @@ export function setupSettings() {
     
     // Toggle icon state
     toggleWordVisibility.innerHTML = isSecret
-      ? `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+      ? `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`
+      : `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
   });
 
   // Pass & Play Submit
@@ -361,7 +414,7 @@ export function showClueBar(show, clueText = "") {
 
 export function updateModeTitle(title) {
   const formattedTitles = {
-    classic: "Classic",
+    unlimited: "Unlimited Mode",
     daily: "Daily Challenge",
     duo: "Duo Mode",
     time_attack: "Time Attack",
@@ -387,7 +440,7 @@ export function showPassPlayModal() {
   passplayError.textContent = "";
   customWordInput.classList.add("masked-input");
   // Set default visibility icon to closed eye
-  toggleWordVisibility.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+  toggleWordVisibility.innerHTML = `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
   passplayDialog.showModal();
 }
 
@@ -545,6 +598,43 @@ function displayWordInfo(wordInfo, word) {
   }
 
   dictionaryCard.style.display = "block";
+}
+
+export function showStartOverlay(mode, onStart) {
+  const existing = board.querySelector(".board-overlay");
+  if (existing) {
+    existing.remove();
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "board-overlay";
+  
+  let title = "";
+  let description = "";
+  let btnText = "";
+  
+  if (mode === "time_attack") {
+    title = "Time Attack";
+    description = "Race against the clock! Solve as many words as you can. Solving a word adds +15 seconds to the timer.";
+    btnText = "Start Race";
+  } else if (mode === "pass_play") {
+    title = "Pass & Play";
+    description = "Local 2-player mode. Player 1 sets a secret 5-letter word, and Player 2 tries to guess it.";
+    btnText = "Setup Secret Word";
+  }
+  
+  overlay.innerHTML = `
+    <h2 class="overlay-title">${title}</h2>
+    <p class="overlay-desc">${description}</p>
+    <button id="start-overlay-btn" class="btn primary-btn">${btnText}</button>
+  `;
+  
+  board.appendChild(overlay);
+  
+  document.getElementById("start-overlay-btn").addEventListener("click", () => {
+    overlay.remove();
+    onStart();
+  });
 }
 
 // Copy Grid Results to Clipboard

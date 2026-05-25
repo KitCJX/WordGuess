@@ -3,8 +3,9 @@ import * as ui from './ui.js';
 import * as audio from './audio.js';
 
 // State Variables
-let gameMode = "daily"; // "classic", "daily", "duo", "time_attack", "clue", "pass_play"
+let gameMode = "daily"; // "unlimited", "daily", "duo", "time_attack", "clue", "pass_play"
 let previousGameMode = "daily";
+let hardMode = false;
 let gameStatus = "IN_PROGRESS"; // "IN_PROGRESS", "WON", "LOST"
 
 // Dictionary and solutions
@@ -197,18 +198,17 @@ export async function initializeGame(newMode = null) {
     ui.showToast("Duo Mode: Solve 2 words!");
     
   } else if (gameMode === "time_attack") {
-    timeLeft = 120; // 2 minutes
     timeScore = 0;
-    ui.updateTimer(timeLeft);
     ui.updateScore(timeScore);
-    
-    // Pick first word
-    selectNextTimeAttackWord();
     ui.drawBoard(6, 5, false);
     
-    // Start countdown
-    startTimeAttackCountdown();
-    ui.showToast("Speed Round: Go!");
+    ui.showStartOverlay("time_attack", () => {
+      timeLeft = 120; // 2 minutes
+      ui.updateTimer(timeLeft);
+      selectNextTimeAttackWord();
+      startTimeAttackCountdown();
+      ui.showToast("Speed Round: Go!");
+    });
     
   } else if (gameMode === "clue") {
     solutionWord = wordBank[Math.floor(Math.random() * wordBank.length)].toLowerCase();
@@ -230,10 +230,12 @@ export async function initializeGame(newMode = null) {
     
   } else if (gameMode === "pass_play") {
     ui.drawBoard(6, 5, false);
-    ui.showPassPlayModal();
+    ui.showStartOverlay("pass_play", () => {
+      ui.showPassPlayModal();
+    });
     
   } else {
-    // Classic Mode
+    // Unlimited Mode
     solutionWord = wordBank[Math.floor(Math.random() * wordBank.length)].toLowerCase();
     
     api.fetchWordInfo(solutionWord).then(info => {
@@ -339,6 +341,54 @@ export function removeLetter() {
   }
 }
 
+function getOrdinal(n) {
+  const ordinals = ["1st", "2nd", "3rd", "4th", "5th"];
+  return ordinals[n] || `${n + 1}th`;
+}
+
+function getBoardConstraints(solution, guessList) {
+  const greens = Array(5).fill(null);
+  const yellows = new Set();
+  
+  guessList.forEach(g => {
+    const evalResult = evaluateGuess(g, solution);
+    evalResult.forEach((status, idx) => {
+      if (status === "correct") {
+        greens[idx] = g[idx];
+      } else if (status === "present") {
+        yellows.add(g[idx]);
+      }
+    });
+  });
+  return { greens, yellows };
+}
+
+function validateGuessAgainstConstraints(guess, constraints) {
+  const { greens, yellows } = constraints;
+  
+  // 1. Check greens
+  for (let i = 0; i < 5; i++) {
+    if (greens[i] !== null && guess[i] !== greens[i]) {
+      return {
+        valid: false,
+        message: `${getOrdinal(i)} letter must be ${greens[i].toUpperCase()}`
+      };
+    }
+  }
+  
+  // 2. Check yellows
+  for (const char of yellows) {
+    if (!guess.includes(char)) {
+      return {
+        valid: false,
+        message: `Must contain ${char.toUpperCase()}`
+      };
+    }
+  }
+  
+  return { valid: true };
+}
+
 export async function submitGuess() {
   if (gameStatus !== "IN_PROGRESS") return;
 
@@ -370,6 +420,48 @@ export async function submitGuess() {
     return;
   }
 
+  // Validation 3: Hard Mode hints constraint
+  if (hardMode && guesses.length > 0) {
+    if (gameMode === "duo") {
+      let b1Valid = false;
+      let b1Msg = "";
+      let b2Valid = false;
+      let b2Msg = "";
+      
+      if (!board1Solved) {
+        const constraints = getBoardConstraints(solutionWord1, guesses);
+        const validation = validateGuessAgainstConstraints(guess, constraints);
+        b1Valid = validation.valid;
+        b1Msg = validation.message;
+      }
+      
+      if (!board2Solved) {
+        const constraints = getBoardConstraints(solutionWord2, guesses);
+        const validation = validateGuessAgainstConstraints(guess, constraints);
+        b2Valid = validation.valid;
+        b2Msg = validation.message;
+      }
+      
+      // Reject if it fails on BOTH unsolved boards
+      if (!b1Valid && !b2Valid) {
+        audio.playError();
+        if (!board1Solved) ui.shakeRow(guesses.length, 0);
+        if (!board2Solved) ui.shakeRow(guesses.length, 1);
+        ui.showToast(b1Msg || b2Msg || "Must satisfy hints");
+        return;
+      }
+    } else {
+      const constraints = getBoardConstraints(solutionWord, guesses);
+      const validation = validateGuessAgainstConstraints(guess, constraints);
+      if (!validation.valid) {
+        audio.playError();
+        ui.shakeRow(guesses.length);
+        ui.showToast(validation.message);
+        return;
+      }
+    }
+  }
+
   guesses.push(guess);
   currentGuess = "";
 
@@ -380,12 +472,12 @@ export async function submitGuess() {
     // Process Time Attack speed evaluations
     processTimeAttackGuess(guess);
   } else {
-    // Process Classic, Daily, Clue, Pass & Play
-    processClassicGuess(guess);
+    // Process Unlimited, Daily, Clue, Pass & Play
+    processUnlimitedGuess(guess);
   }
 }
 
-function processClassicGuess(guess) {
+function processUnlimitedGuess(guess) {
   const evaluation = evaluateGuess(guess, solutionWord);
   
   audio.playFlip(guesses.length - 1);
@@ -563,4 +655,12 @@ function updateStats(win, guessCount) {
 
 export function cancelPassPlay() {
   initializeGame(previousGameMode);
+}
+
+export function setHardMode(enabled) {
+  hardMode = enabled;
+}
+
+export function isHardMode() {
+  return hardMode;
 }

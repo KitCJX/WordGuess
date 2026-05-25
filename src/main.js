@@ -21,9 +21,10 @@ ui.registerPassPlayCancelHandler(() => {
 
 // Keyboard input binding (physical keyboard)
 window.addEventListener("keydown", (event) => {
-  // Ignore inputs if a dialog is open (e.g. settings, help, modes, or passplay input fields)
+  // Ignore inputs if a dialog or start overlay is open (e.g. settings, help, modes, or start screens)
   const activeDialog = document.querySelector("dialog[open]");
-  if (activeDialog) return;
+  const startOverlay = document.querySelector(".board-overlay");
+  if (activeDialog || startOverlay) return;
 
   const key = event.key;
   
@@ -39,6 +40,10 @@ window.addEventListener("keydown", (event) => {
 // Virtual keyboard binding (using event delegation)
 const keyboard = document.getElementById("keyboard");
 keyboard.addEventListener("click", (event) => {
+  // Ignore inputs if start overlay is open
+  const startOverlay = document.querySelector(".board-overlay");
+  if (startOverlay) return;
+
   const btn = event.target.closest("button.key");
   if (!btn) return;
 
