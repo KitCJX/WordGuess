@@ -64,11 +64,3 @@ Built from scratch using modern modular ES6 Javascript:
      ```
 3. Open `http://localhost:8080` in your web browser.
 
-**Developer Cheat Code**: Open your browser developer console (F12) and run `alohomora()` to see the solution word.
-
----
-
-## ✍️ Credits
-
-Created by **CJX1001**
-
