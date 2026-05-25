@@ -33,6 +33,8 @@
   --key-bg: #e2e8f0;
   --key-bg-hover: #cbd5e1;
   --key-text: #0f172a;
+  --key-bg-absent: #cbd5e1;
+  --key-text-absent: #64748b;
   
   --dialog-bg: rgba(255, 255, 255, 0.8);
   --dialog-border: rgba(15, 23, 42, 0.08);
@@ -64,6 +66,8 @@
   --key-bg: #1e293b;
   --key-bg-hover: #334155;
   --key-text: #f8fafc;
+  --key-bg-absent: #0b0f19;
+  --key-text-absent: #475569;
   
   --dialog-bg: rgba(15, 23, 42, 0.85);
   --dialog-border: rgba(255, 255, 255, 0.08);
@@ -393,8 +397,8 @@ footer {
 }
 
 .key.absent {
-  background-color: var(--color-absent) !important;
-  color: var(--color-absent-text) !important;
+  background-color: var(--key-bg-absent) !important;
+  color: var(--key-text-absent) !important;
   opacity: 0.6;
 }
 
