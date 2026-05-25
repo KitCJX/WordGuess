@@ -15,11 +15,19 @@
     <div class="app-container">
       <header>
         <div class="header-content">
-          <button id="help-btn" class="icon-btn" aria-label="How to play">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          </button>
+          <div class="header-left">
+            <button id="help-btn" class="icon-btn" aria-label="How to play">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </button>
+            <button id="mode-btn" class="icon-btn" aria-label="Select Game Mode">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </button>
+          </div>
           
-          <h1 class="logo">WORD<span>GUESS</span></h1>
+          <div class="logo-wrapper">
+            <h1 class="logo">WORD<span>GUESS</span></h1>
+            <div id="mode-title" class="mode-indicator">Classic</div>
+          </div>
           
           <div class="header-actions">
             <button id="stats-btn" class="icon-btn" aria-label="Game statistics">
@@ -33,50 +41,23 @@
       </header>
 
       <main class="game-content">
+        <div class="hud-wrapper">
+          <!-- Time Attack HUD -->
+          <div id="timer-bar" class="hud-item" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="game-timer">02:00</span>
+            <span class="hud-divider">|</span>
+            <span>Score: <strong id="game-score">0</strong></span>
+          </div>
+          <!-- Clue Mode HUD -->
+          <div id="clue-bar" class="hud-item clue-card" style="display: none;">
+            <span class="clue-tag">CLUE</span>
+            <p id="game-clue">Loading definition clue...</p>
+          </div>
+        </div>
+
         <div id="board" aria-label="Game board grid">
-          <!-- 6 rows of 5 tiles generated or static. Pre-rendering keeps it layout stable -->
-          <div class="row" data-row="0">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
-          <div class="row" data-row="1">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
-          <div class="row" data-row="2">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
-          <div class="row" data-row="3">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
-          <div class="row" data-row="4">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
-          <div class="row" data-row="5">
-            <div class="tile" data-idx="0"></div>
-            <div class="tile" data-idx="1"></div>
-            <div class="tile" data-idx="2"></div>
-            <div class="tile" data-idx="3"></div>
-            <div class="tile" data-idx="4"></div>
-          </div>
+          <!-- Dynamically populated rows and columns via Javascript -->
         </div>
       </main>
 
@@ -230,6 +211,7 @@
           </div>
 
           <div class="game-over-actions">
+            <button id="share-btn" class="btn secondary-btn" style="display: none;">Share Result</button>
             <button id="play-again-btn" class="btn primary-btn">Play Again</button>
           </div>
         </div>
@@ -288,6 +270,82 @@
       </div>
     </dialog>
 
+    <!-- Mode Selector Dialog -->
+    <dialog id="mode-dialog" class="glass-modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2>SELECT MODE</h2>
+          <button class="close-btn icon-btn" aria-label="Close dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </header>
+        <div class="modal-body">
+          <div class="mode-list">
+            <button class="mode-card active" data-mode="classic">
+              <div class="mode-header-info">
+                <span class="mode-name">Classic Mode</span>
+                <span class="mode-desc">Relaxed, unlimited 5-letter word puzzles.</span>
+              </div>
+            </button>
+            <button class="mode-card" data-mode="daily">
+              <div class="mode-header-info">
+                <span class="mode-name">Daily Challenge</span>
+                <span class="mode-desc">A new puzzle every day, identical for everyone. Share results!</span>
+              </div>
+            </button>
+            <button class="mode-card" data-mode="duo">
+              <div class="mode-header-info">
+                <span class="mode-name">Duo Mode</span>
+                <span class="mode-desc">Dordle style: guess 2 words at once in 7 tries. Double grid!</span>
+              </div>
+            </button>
+            <button class="mode-card" data-mode="time_attack">
+              <div class="mode-header-info">
+                <span class="mode-name">Time Attack</span>
+                <span class="mode-desc">Count down: solve words quickly to gain points and add time.</span>
+              </div>
+            </button>
+            <button class="mode-card" data-mode="clue">
+              <div class="mode-header-info">
+                <span class="mode-name">Clue Mode</span>
+                <span class="mode-desc">Crossword hybrid: solve standard board using definition hint.</span>
+              </div>
+            </button>
+            <button class="mode-card" data-mode="pass_play">
+              <div class="mode-header-info">
+                <span class="mode-name">Pass & Play</span>
+                <span class="mode-desc">Local 2-player: Type a custom word for a friend to solve.</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Pass & Play Input Modal -->
+    <dialog id="passplay-dialog" class="glass-modal">
+      <div class="modal-content">
+        <header class="modal-header">
+          <h2>CREATE WORD</h2>
+        </header>
+        <div class="modal-body">
+          <p>Player 1: Enter a secret 5-letter word for Player 2 to guess.</p>
+          <div class="passplay-input-container">
+            <input type="text" id="custom-word-input" class="masked-input" maxlength="5" placeholder="Enter 5-letter word" autofocus autocomplete="off" spellcheck="false" />
+            <button id="toggle-word-visibility" class="icon-btn" aria-label="Toggle word visibility">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <div id="passplay-error" class="passplay-error-message"></div>
+          <div class="game-over-actions">
+            <button id="passplay-cancel" class="btn secondary-btn">Cancel</button>
+            <button id="custom-word-submit" class="btn primary-btn">Set Word</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
     <script src="src/main.js" type="module"></script>
   </body>
 </html>
+

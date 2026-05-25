@@ -1,12 +1,27 @@
 import * as game from './game.js';
 import * as ui from './ui.js';
 
-// Setup settings toggles, modal buttons, close buttons
+// Setup settings toggles, modal buttons, and close buttons
 ui.setupSettings();
+
+// Register game mode selection routing
+ui.registerModeSelectHandler((newMode) => {
+  game.initializeGame(newMode);
+});
+
+// Register Pass & Play custom word submission
+ui.registerPassPlaySubmitHandler((customWord) => {
+  game.setupPassPlayWord(customWord);
+});
+
+// Register Pass & Play cancellation
+ui.registerPassPlayCancelHandler(() => {
+  game.cancelPassPlay();
+});
 
 // Keyboard input binding (physical keyboard)
 window.addEventListener("keydown", (event) => {
-  // Ignore inputs if user is focusing on an input fields or if dialog is open
+  // Ignore inputs if a dialog is open (e.g. settings, help, modes, or passplay input fields)
   const activeDialog = document.querySelector("dialog[open]");
   if (activeDialog) return;
 
@@ -49,9 +64,10 @@ ui.attachPlayAgainHandler(() => {
 
 // Developer cheat code
 window.alohomora = () => {
-  console.log(`%c[CHEAT ACTIVATED]%c The solution is: %c${game.getSolutionWord().toUpperCase()}`, "color: #16a34a; font-weight: bold;", "color: inherit;", "color: #eab308; font-weight: bold;");
+  const sol = game.getSolutionWord();
+  const solText = Array.isArray(sol) ? sol.join(" & ") : sol;
+  console.log(`%c[CHEAT ACTIVATED]%c The solution is: %c${solText.toUpperCase()}`, "color: #16a34a; font-weight: bold;", "color: inherit;", "color: #eab308; font-weight: bold;");
 };
 
-// Start the game!
-game.initializeGame();
-
+// Start the game! (Daily Challenge by default)
+game.initializeGame("daily");
