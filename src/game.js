@@ -31,6 +31,10 @@ let timeInterval = null;
 let guesses = []; // List of submitted 5-letter words
 let currentGuess = ""; // Currently typed string
 
+// Daily Challenge progress is stored separately from long-term statistics.
+const DAILY_ROUND_STORAGE_KEY = "wordguess_daily_round_v1";
+const DAILY_ROUND_VERSION = 1;
+
 // Stats template
 const defaultStats = {
   played: 0,
@@ -83,6 +87,86 @@ function saveStats() {
   }
 }
 
+function getDailyId(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function clearDailyRound() {
+  try {
+    localStorage.removeItem(DAILY_ROUND_STORAGE_KEY);
+  } catch (e) {
+    console.error("Failed to clear Daily Challenge progress:", e);
+  }
+}
+
+function saveDailyRound() {
+  if (gameMode !== "daily" || !solutionWord) return;
+
+  try {
+    localStorage.setItem(DAILY_ROUND_STORAGE_KEY, JSON.stringify({
+      version: DAILY_ROUND_VERSION,
+      dailyId: getDailyId(),
+      guesses,
+      currentGuess,
+      status: gameStatus
+    }));
+  } catch (e) {
+    console.error("Failed to save Daily Challenge progress:", e);
+  }
+}
+
+function restoreDailyRound() {
+  try {
+    const savedValue = localStorage.getItem(DAILY_ROUND_STORAGE_KEY);
+    if (!savedValue) return false;
+
+    const saved = JSON.parse(savedValue);
+    const validGuesses = Array.isArray(saved.guesses)
+      && saved.guesses.length <= 6
+      && saved.guesses.every(guess => (
+        typeof guess === "string"
+        && /^[a-z]{5}$/.test(guess)
+        && (wordBank.includes(guess) || allowedGuesses.includes(guess))
+      ));
+    const validCurrentGuess = typeof saved.currentGuess === "string"
+      && /^[a-z]{0,5}$/.test(saved.currentGuess);
+
+    if (
+      saved.version !== DAILY_ROUND_VERSION
+      || saved.dailyId !== getDailyId()
+      || !validGuesses
+      || !validCurrentGuess
+    ) {
+      clearDailyRound();
+      return false;
+    }
+
+    guesses = [...saved.guesses];
+    gameStatus = guesses.includes(solutionWord)
+      ? "WON"
+      : guesses.length === 6
+        ? "LOST"
+        : "IN_PROGRESS";
+    currentGuess = gameStatus === "IN_PROGRESS" ? saved.currentGuess : "";
+
+    guesses.forEach((guess, rowIdx) => {
+      ui.restoreRow(rowIdx, guess, evaluateGuess(guess, solutionWord));
+    });
+    [...currentGuess].forEach((letter, colIdx) => {
+      ui.updateTile(guesses.length, colIdx, letter);
+    });
+
+    return guesses.length > 0 || currentGuess.length > 0 || gameStatus !== "IN_PROGRESS";
+  } catch (e) {
+    console.error("Failed to restore Daily Challenge progress:", e);
+    clearDailyRound();
+    return false;
+  }
+}
+
 export function getStats() {
   return gameStats;
 }
@@ -117,7 +201,7 @@ export function getWordInfo() {
   return wordInfo;
 }
 
-export async function initializeGame(newMode = null) {
+export async function initializeGame(newMode = null, { forceNew = false } = {}) {
   if (newMode) {
     if (newMode !== "pass_play") {
       previousGameMode = gameMode;
@@ -172,7 +256,11 @@ export async function initializeGame(newMode = null) {
     
     // Draw 6x5 Board
     ui.drawBoard(6, 5, false);
-    ui.showToast("Today's Daily Challenge!");
+    if (forceNew) {
+      clearDailyRound();
+    }
+    const restored = !forceNew && restoreDailyRound();
+    ui.showToast(restored ? "Daily Challenge restored." : "Today's Daily Challenge!");
     
   } else if (gameMode === "duo") {
     // Select 2 words
@@ -320,6 +408,8 @@ export function addLetter(letter) {
   } else {
     ui.updateTile(guesses.length, currentGuess.length - 1, letter);
   }
+
+  saveDailyRound();
 }
 
 export function removeLetter() {
@@ -339,6 +429,8 @@ export function removeLetter() {
   } else {
     ui.updateTile(guesses.length, currentGuess.length, "");
   }
+
+  saveDailyRound();
 }
 
 function getOrdinal(n) {
@@ -475,6 +567,8 @@ export async function submitGuess() {
     // Process Unlimited, Daily, Clue, Pass & Play
     processUnlimitedGuess(guess);
   }
+
+  saveDailyRound();
 }
 
 function processUnlimitedGuess(guess) {

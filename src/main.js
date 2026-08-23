@@ -64,7 +64,7 @@ keyboard.addEventListener("click", (event) => {
 
 // Play Again Hook
 ui.attachPlayAgainHandler(() => {
-  game.initializeGame();
+  game.initializeGame(null, { forceNew: true });
 });
 
 // Developer cheat code

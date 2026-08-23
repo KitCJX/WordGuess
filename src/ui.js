@@ -390,6 +390,43 @@ export function revealRow(rowIdx, guess, evaluation, boardIdx = null) {
   });
 }
 
+// Restore a submitted row immediately, without replaying flip animations or sounds.
+export function restoreRow(rowIdx, guess, evaluation, boardIdx = null) {
+  let tileContainer = board;
+  if (boardIdx !== null) {
+    tileContainer = document.getElementById(`board-${boardIdx + 1}`);
+  }
+  if (!tileContainer) return;
+
+  const row = tileContainer.querySelector(`[data-row="${rowIdx}"]`);
+  if (!row) return;
+
+  const tiles = row.querySelectorAll(".tile");
+  evaluation.forEach((status, i) => {
+    const tile = tiles[i];
+    if (!tile) return;
+
+    tile.textContent = guess[i];
+    tile.classList.remove("active", "correct", "present", "absent");
+    tile.classList.add(status);
+
+    const keyElement = keyboard.querySelector(`.key[data-key="${guess[i]}"]`);
+    if (!keyElement) return;
+
+    if (status === "correct") {
+      keyElement.className = "key correct";
+    } else if (status === "present" && !keyElement.classList.contains("correct")) {
+      keyElement.className = "key present";
+    } else if (
+      status === "absent"
+      && !keyElement.classList.contains("correct")
+      && !keyElement.classList.contains("present")
+    ) {
+      keyElement.className = "key absent";
+    }
+  });
+}
+
 // HUD Rendering API
 export function showTimerBar(show) {
   timerBar.style.display = show ? "flex" : "none";
