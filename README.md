@@ -15,6 +15,7 @@ Play the game live here: [kitcjx.github.io/WordGuess/](https://kitcjx.github.io/
 - **Programmatic Audio Synthesizer**: Utilizes the native **Web Audio API** to generate retro-style sound effects (key clicks, deletion taps, error vibrations, success arpeggios, and failure slide downs) without loading external audio files. Includes a mute switch.
 - **Glassmorphic Theme Customization**: Custom settings dialog menu featuring a **Dark/Light Mode** toggle, **Colorblind Mode** high-contrast color scheme overrides, and mute switches using modern CSS custom property variables and backdrop filters.
 - **Statistics & Streaks Tracker**: Tracks games played, win percentage, current streak, max streak, and guess frequency distributions saved securely in the browser's local storage (`localStorage`).
+- **Installable Progressive Web App**: Installs on supported desktop and mobile browsers, launches in a standalone window, and caches the full game shell and word lists for offline play.
 - **Post-Game Dictionary definitions**: Queries the Dictionary API to show phonetic spellings, parts of speech, and definitions when the game finishes, with an interactive button to play native audio pronunciations if available.
 - **Dual-List Resilient Validation**: Validates user guesses against a secondary allowed list of **~10,600 dictionary words**, while daily target words are selected from a curated list of **~2,300 guessable common words**.
 - **Offline & Fallback Support**: Automatically prioritizes loading local lists, falling back to raw GitHub CDN URLs if CORS or local files are blocked, and defaults to a hardcoded array if offline.
@@ -44,6 +45,10 @@ Built from scratch using modern modular ES6 Javascript:
 - **`src/ui.js`**: DOM controller, dialogue animations, horizontal stats chart renderer, and toast overlays.
 - **`src/api.js`**: Dual-list downloader and Dictionary API definition queries.
 - **`src/audio.js`**: Web Audio synthesizer waves.
+- **`manifest.webmanifest`**: Installation metadata, standalone display settings, and app icon definitions.
+- **`service-worker.js`**: Versioned app-shell caching, offline navigation fallback, and cache cleanup.
+
+Dictionary definitions and pronunciation audio require a network connection. The game board, locally bundled word lists, settings, statistics, and saved Daily Challenge progress continue to work offline after the first successful visit.
 
 ---
 
@@ -63,4 +68,3 @@ Built from scratch using modern modular ES6 Javascript:
      npx http-server -p 8080
      ```
 3. Open `http://localhost:8080` in your web browser.
-

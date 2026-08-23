@@ -64,6 +64,16 @@ let modeSelectHandler = null;
 let passPlaySubmitHandler = null;
 let passPlayCancelHandler = null;
 
+function updateBrowserThemeMetadata(theme) {
+  const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+  if (colorSchemeMeta) colorSchemeMeta.content = theme;
+
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.content = theme === "dark" ? "#0f172a" : "#f8fafc";
+  }
+}
+
 // Initialize Settings and Dialog Bindings
 export function setupSettings() {
   // Theme Setup
@@ -78,28 +88,23 @@ export function setupSettings() {
   if (isDark) {
     document.documentElement.classList.add("dark-theme");
     document.documentElement.classList.remove("light-theme");
-    const meta = document.querySelector('meta[name="color-scheme"]');
-    if (meta) meta.content = "dark";
   } else {
     document.documentElement.classList.add("light-theme");
     document.documentElement.classList.remove("dark-theme");
-    const meta = document.querySelector('meta[name="color-scheme"]');
-    if (meta) meta.content = "light";
   }
+  updateBrowserThemeMetadata(isDark ? "dark" : "light");
   
   themeToggle.addEventListener("change", () => {
     if (themeToggle.checked) {
       document.documentElement.classList.remove("light-theme");
       document.documentElement.classList.add("dark-theme");
       localStorage.setItem("wordguess_theme", "dark");
-      const meta = document.querySelector('meta[name="color-scheme"]');
-      if (meta) meta.content = "dark";
+      updateBrowserThemeMetadata("dark");
     } else {
       document.documentElement.classList.remove("dark-theme");
       document.documentElement.classList.add("light-theme");
       localStorage.setItem("wordguess_theme", "light");
-      const meta = document.querySelector('meta[name="color-scheme"]');
-      if (meta) meta.content = "light";
+      updateBrowserThemeMetadata("light");
     }
   });
 

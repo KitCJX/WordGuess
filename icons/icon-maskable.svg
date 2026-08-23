@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">WordGuess</title>
+  <rect width="512" height="512" fill="#4bd02f" />
+  <path
+    fill="#ffffff"
+    d="M96 144h58l40 192 40-192h44l40 192 40-192h58l-66 238h-62l-32-144-32 144h-62z"
+  />
+</svg>

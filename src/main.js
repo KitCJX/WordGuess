@@ -1,6 +1,16 @@
 import * as game from './game.js';
 import * as ui from './ui.js';
 
+// Register the offline app shell. Relative URLs keep the scope valid on GitHub Pages.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js", { scope: "./" })
+      .catch(error => {
+        console.error("Service worker registration failed:", error);
+      });
+  });
+}
+
 // Setup settings toggles, modal buttons, and close buttons
 ui.setupSettings();
 

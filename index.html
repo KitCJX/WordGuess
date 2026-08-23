@@ -4,9 +4,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="WordGuess" />
     <title>WordGuess — Word Puzzle</title>
     <meta name="description" content="Guess the secret 5-letter word in 6 attempts. Sleek animations, stats tracker, definitions, and sound effects." />
-    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,6 +26,10 @@
         const savedTheme = localStorage.getItem("wordguess_theme");
         const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
         const activeTheme = savedTheme || (prefersLight ? "light" : "dark");
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        if (themeColorMeta) {
+          themeColorMeta.content = activeTheme === "light" ? "#f8fafc" : "#0f172a";
+        }
         if (activeTheme === "light") {
           document.documentElement.classList.add("light-theme");
           document.documentElement.classList.remove("dark-theme");
@@ -481,4 +492,3 @@
     <script src="src/main.js" type="module"></script>
   </body>
 </html>
-
